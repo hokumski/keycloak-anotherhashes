@@ -1,11 +1,6 @@
-package com.keenetic.account.keycloak.md5;
+package com.keenetic.account.keycloak.anotherhashes;
 
 import org.junit.Test;
-
-import java.math.BigInteger;
-import java.security.MessageDigest;
-
-
 import static org.junit.Assert.assertEquals;
 
 public class MD5PasswordHashProviderTest {

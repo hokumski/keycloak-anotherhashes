@@ -1,0 +1,6 @@
+# IDE
+keycloak-bcrypt/.idea
+*.iml
+
+# Maven
+target

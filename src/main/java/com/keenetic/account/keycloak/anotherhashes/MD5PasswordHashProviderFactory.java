@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.keenetic.account.keycloak.md5;
+package com.keenetic.account.keycloak.anotherhashes;
 
 import org.keycloak.Config;
 import org.keycloak.credential.hash.PasswordHashProvider;
