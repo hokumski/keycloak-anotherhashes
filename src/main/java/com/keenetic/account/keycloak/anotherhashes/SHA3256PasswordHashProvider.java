@@ -22,10 +22,9 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 
 import org.bouncycastle.jcajce.provider.digest.SHA3.Digest256;
-import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.hash.PasswordHashProvider;
 import org.keycloak.models.PasswordPolicy;
-import org.keycloak.models.UserCredentialModel;
+import org.keycloak.models.credential.PasswordCredentialModel;
 
 /**
  * @author <a href="mailto:hokum@dived.me">Andrey Kotov</a>
@@ -41,43 +40,36 @@ public class SHA3256PasswordHashProvider implements PasswordHashProvider {
   }
 
   @Override
-  public boolean policyCheck(PasswordPolicy policy, CredentialModel credential) {
-    // no need to check hash iterations, as SHA3-256 doesn't use it
-    return providerId.equals(credential.getAlgorithm());
+  public boolean policyCheck(PasswordPolicy passwordPolicy, PasswordCredentialModel passwordCredentialModel) {
+    return providerId.equals(passwordCredentialModel.getPasswordCredentialData().getAlgorithm());
+  }
+
+  @Override
+  public PasswordCredentialModel encodedCredential(String rawPassword, int iterations) {
+    String encodedPassword = encode(rawPassword, iterations);
+    return PasswordCredentialModel.createFromValues(providerId, null, iterations, encodedPassword);
   }
 
   @Override
   public String encode(String rawPassword, int iterations) {
-    String hashedPassword = "";
     MessageDigest md = new Digest256();
     md.update(rawPassword.getBytes());
-    BigInteger digestInt = new BigInteger(1,md.digest());
+    BigInteger digestInt = new BigInteger(1, md.digest());
     StringBuilder sbZeroes = new StringBuilder(digestInt.toString(16));
-    while(sbZeroes.length() < 64 ){ // add leading zeroes to 64 chars
+    while (sbZeroes.length() < 64) { // add leading zeroes to 64 chars
       sbZeroes.insert(0, "0");
     }
-    hashedPassword = sbZeroes.toString();
-    return hashedPassword;
+    return sbZeroes.toString();
   }
 
   @Override
-  public void encode(String rawPassword, int iterations, CredentialModel credential) {
-    String password = this.encode(rawPassword, iterations);
-    credential.setAlgorithm(providerId);
-    credential.setType(UserCredentialModel.PASSWORD);
-    credential.setHashIterations(0);
-    credential.setValue(password);
-    credential.setSalt(new byte[0]);
+  public boolean verify(String rawPassword, PasswordCredentialModel passwordCredentialModel) {
+    return encode(rawPassword, passwordCredentialModel.getPasswordCredentialData().getHashIterations()).equals(passwordCredentialModel.getPasswordSecretData().getValue());
   }
 
   @Override
   public void close() {
 
-  }
-
-  @Override
-  public boolean verify(String rawPassword, CredentialModel credential) {
-    return this.encode(rawPassword, 0).equals(credential.getValue());
   }
 
 }
