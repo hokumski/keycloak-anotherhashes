@@ -17,7 +17,6 @@
 
 package com.keenetic.account.keycloak.anotherhashes;
 
-// import org.jboss.logging.Logger;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import org.keycloak.credential.hash.PasswordHashProvider;
@@ -29,6 +28,7 @@ import org.keycloak.models.credential.PasswordCredentialModel;
  */
 public class MD5PasswordHashProvider implements PasswordHashProvider {
 
+    // Reference is
     // https://github.com/keycloak/keycloak/blob/master/server-spi-private/src/main/java/org/keycloak/credential/hash/Pbkdf2PasswordHashProvider.java
 
     private final String providerId;
@@ -66,7 +66,8 @@ public class MD5PasswordHashProvider implements PasswordHashProvider {
 
     @Override
     public boolean verify(String rawPassword, PasswordCredentialModel passwordCredentialModel) {
-        return encode(rawPassword, passwordCredentialModel.getPasswordCredentialData().getHashIterations()).equals(passwordCredentialModel.getPasswordSecretData().getValue());
+        return encode(rawPassword, passwordCredentialModel.getPasswordCredentialData().getHashIterations())
+                .equals(passwordCredentialModel.getPasswordSecretData().getValue());
     }
 
     @Override
